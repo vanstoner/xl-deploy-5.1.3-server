@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+    Note: If you modify this file and automatic reloading is disabled in `planner.conf`, you must restart the XL Deploy server.
+-->
+<rules xmlns="http://www.xebialabs.com/xl-deploy/xl-rules">
+    <!-- Add your <rule ...> and <disable-rule ...> elements here -->
+    <rule name="bnp.DeployedFolderApplication.CREATE_MODIFY" scope="deployed">
+      <conditions>
+          <type>bnp.DeployedFolderApplication</type>
+          <operation>CREATE</operation>
+          <operation>MODIFY</operation>
+          <operation>NOOP</operation>
+      </conditions>
+      <steps>
+        <powershell>
+          <order>30</order>
+          <description>Run the Stop Containers Script</description>
+          <script>bnp/stopContainers.ps1</script>
+          <target-host expression="true">delta.deployedOrPrevious.container</target-host>
+          <powershell-context>
+              <executableScript expression="true">deployed.executableScript</executableScript>
+          </powershell-context>
+        </powershell>
+        <powershell>
+          <order>90</order>
+          <description>Run the Start Containers Script</description>
+          <script>bnp/startContainers.ps1</script>
+          <target-host expression="true">delta.deployedOrPrevious.container</target-host>
+          <powershell-context>
+              <who>World</who>
+          </powershell-context>
+        </powershell>
+      </steps>
+    </rule>
+</rules>
